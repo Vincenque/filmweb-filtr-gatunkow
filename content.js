@@ -4,9 +4,10 @@
 const znacznikCzasu = new Date().toISOString();
 let trybWykluczania = false;
 const wykluczoneGatunki = new Set();
+let aktywneWykluczenia = new Set(); // Przechowuje gatunki do ukrycia po zatwierdzeniu
 let obserwatorInterfejsu;
 
-console.log(`[${znacznikCzasu}] Uruchomiono Filmweb Wykluczacz Kategorii (V0.01)`);
+console.log(`[${znacznikCzasu}] Uruchomiono Filmweb Wykluczacz Kategorii (V0.04)`);
 
 function wstrzyknijPrzelacznik() {
     if (document.getElementById('fw-przelacznik-trybu')) return;
@@ -79,7 +80,33 @@ function podepnijWszystkieGatunki() {
         const gatunek = tekst.toLowerCase();
         
         // Rozszerzona lista ignorowanych przycisków
-        if (!tekst || ['zapisz', 'wyczyść', 'pokaż wyniki', 'wyczyść wszystko'].includes(gatunek)) return;
+        if (!tekst || gatunek === 'zapisz') return;
+
+        // Obsługa przycisków czyszczenia filtrowania
+        if (gatunek === 'wyczyść' || gatunek === 'wyczyść wszystko') {
+            if (!przycisk.dataset.fwPodpietyWyczysc) {
+                przycisk.dataset.fwPodpietyWyczysc = "true";
+                przycisk.addEventListener('click', () => {
+                    wykluczoneGatunki.clear();
+                    aktywneWykluczenia.clear();
+                    aktualizujWygladGatunkow();
+                    zastosujWykluczeniaWewnatrz();
+                });
+            }
+            return;
+        }
+
+        // Podpinamy przycisk "Pokaż wyniki" jako zatwierdzenie naszych wykluczeń
+        if (gatunek === 'pokaż wyniki') {
+            if (!przycisk.dataset.fwPodpietyWyniki) {
+                przycisk.dataset.fwPodpietyWyniki = "true";
+                przycisk.addEventListener('click', () => {
+                    aktywneWykluczenia = new Set(wykluczoneGatunki);
+                    zastosujWykluczeniaWewnatrz();
+                });
+            }
+            return;
+        }
 
         // ZAWSZE odświeżamy wygląd. Filmweb działa na React, który ciągle
         // nadpisuje klasy, więc musimy to wymuszać przy każdej zmianie DOM.
@@ -94,6 +121,8 @@ function podepnijWszystkieGatunki() {
         przycisk.dataset.fwPodpiety = "true";
 
         przycisk.addEventListener('click', (e) => {
+            if (e.isSimulated) return;
+
             if (trybWykluczania) {
                 // Blokujemy domyślne zachowanie
                 e.stopPropagation(); 
@@ -110,18 +139,16 @@ function podepnijWszystkieGatunki() {
                     if(przycisk.getAttribute('type') === 'selected') {
                         // Wypuszczamy kliknięcie asynchronicznie, żeby odznaczyło się w tle
                         setTimeout(() => {
-                            trybWykluczania = false;
-                            przycisk.click();
-                            trybWykluczania = true;
+                            const symulowanyKlik = new MouseEvent('click', { bubbles: true, cancelable: true });
+                            symulowanyKlik.isSimulated = true;
+                            przycisk.dispatchEvent(symulowanyKlik);
                         }, 10);
                     }
                 }
-                zastosujWykluczeniaWewnatrz(); 
             } else {
                 if (wykluczoneGatunki.has(gatunek)) {
                     wykluczoneGatunki.delete(gatunek);
                     przycisk.classList.remove('fw-wykluczony-przycisk');
-                    zastosujWykluczeniaWewnatrz();
                 }
             }
         }, true);
@@ -147,7 +174,8 @@ function zastosujWykluczeniaWewnatrz() {
             if (dt.textContent.trim().toLowerCase() === 'gatunek') {
                 const dl = dt.parentElement; 
                 const gatunkiFilmu = Array.from(dl.querySelectorAll('dd')).map(dd => dd.textContent.trim().toLowerCase());
-                const czyUkryc = gatunkiFilmu.some(g => wykluczoneGatunki.has(g));
+                // Używamy aktywneWykluczenia zamiast stanu UI (żeby działało dopiero po zatwierdzeniu)
+                const czyUkryc = gatunkiFilmu.some(g => aktywneWykluczenia.has(g));
 
                 let kartaFilmu = dl.closest('div');
                 if (kartaFilmu && kartaFilmu.parentElement) {
