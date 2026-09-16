@@ -1,0 +1,68 @@
+/*
+ * Treści są generowane przez AI na podstawie promptów Vincenque (https://github.com/Vincenque)
+ */
+#fw-przelacznik-trybu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 15px 0 15px 15px;
+}
+
+.fw-etykieta {
+  font-size: 14px;
+  color: #999;
+  font-weight: normal;
+  transition: color 0.3s;
+}
+
+.fw-aktywna {
+  color: #000;
+  font-weight: bold;
+}
+
+.fw-aktywna-wyklucz {
+  color: #e50000; 
+  font-weight: bold;
+}
+
+#fw-suwak {
+  width: 46px;
+  height: 24px;
+  background-color: #ddd;
+  border-radius: 20px;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  padding: 0;
+  outline: none;
+}
+
+#fw-suwak::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#fw-suwak.fw-suwak-wyklucz {
+  background-color: #e50000;
+}
+
+#fw-suwak.fw-suwak-wyklucz::after {
+  transform: translateX(22px);
+}
+
+/* Wymuszamy czerwony wygląd wykluczonych gatunków */
+button.fw-wykluczony-przycisk {
+  background-color: #ffeaea !important;
+  color: #e50000 !important;
+  border: 1px solid #e50000 !important;
+  text-decoration: line-through;
+}
