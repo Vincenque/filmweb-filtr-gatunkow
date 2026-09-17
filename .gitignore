@@ -1,3 +1,4 @@
 repoweaver_context.json
 *.workspace
 .patch_history.json
+*.zip
