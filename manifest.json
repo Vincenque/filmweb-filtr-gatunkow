@@ -1,7 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Filmweb Filtr Gatunków",
-  "version": "0.06",
+  "version": "0.07",
+  "icons": {
+    "128": "icon128.png"
+  },
   "content_scripts": [
     {
       "matches": ["*://*.filmweb.pl/*"],
