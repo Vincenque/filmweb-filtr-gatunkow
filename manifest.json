@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Filmweb Filtr Gatunków",
-  "version": "0.08",
+  "version": "0.10",
   "description": "Ukrywaj niechciane gatunki filmów w wynikach wyszukiwania na Filmweb.pl.",
   "icons": {
     "128": "icon128.png"
