@@ -7,7 +7,7 @@ const wykluczoneGatunki = new Set();
 let aktywneWykluczenia = new Set(); // Przechowuje gatunki do ukrycia po zatwierdzeniu
 let obserwatorInterfejsu;
 
-console.log(`[${znacznikCzasu}] Uruchomiono Filmweb Wykluczacz Kategorii (V0.04)`);
+console.log(`[${znacznikCzasu}] Uruchomiono Filmweb Wykluczacz Kategorii (V0.05)`);
 
 function wstrzyknijPrzelacznik() {
     if (document.getElementById('fw-przelacznik-trybu')) return;
@@ -131,22 +131,22 @@ function podepnijWszystkieGatunki() {
                 if (wykluczoneGatunki.has(gatunek)) {
                     wykluczoneGatunki.delete(gatunek);
                     przycisk.classList.remove('fw-wykluczony-przycisk');
+                } else if (przycisk.getAttribute('type') === 'selected') {
+                    // Jeśli gatunek był zaznaczony, najpierw tylko odznaczamy go w systemie (reset do neutralnego)
+                    setTimeout(() => {
+                        const symulowanyKlik = new MouseEvent('click', { bubbles: true, cancelable: true });
+                        symulowanyKlik.isSimulated = true;
+                        przycisk.dispatchEvent(symulowanyKlik);
+                    }, 10);
                 } else {
                     wykluczoneGatunki.add(gatunek);
                     przycisk.classList.add('fw-wykluczony-przycisk');
-                    
-                    // Jeśli gatunek był zaznaczony normalnie, odznaczamy go w systemie Filmwebu
-                    if(przycisk.getAttribute('type') === 'selected') {
-                        // Wypuszczamy kliknięcie asynchronicznie, żeby odznaczyło się w tle
-                        setTimeout(() => {
-                            const symulowanyKlik = new MouseEvent('click', { bubbles: true, cancelable: true });
-                            symulowanyKlik.isSimulated = true;
-                            przycisk.dispatchEvent(symulowanyKlik);
-                        }, 10);
-                    }
                 }
             } else {
                 if (wykluczoneGatunki.has(gatunek)) {
+                    // Blokujemy natywne zaznaczenie - kliknięcie ma tylko usunąć wykluczenie
+                    e.stopPropagation(); 
+                    e.preventDefault();
                     wykluczoneGatunki.delete(gatunek);
                     przycisk.classList.remove('fw-wykluczony-przycisk');
                 }
