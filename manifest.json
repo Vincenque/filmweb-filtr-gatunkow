@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Filmweb Wykluczacz",
-  "version": "0.05",
+  "name": "Filmweb Filtr Gatunków",
+  "version": "0.06",
   "content_scripts": [
     {
       "matches": ["*://*.filmweb.pl/*"],
